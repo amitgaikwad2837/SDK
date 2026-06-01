@@ -21,6 +21,11 @@ subprojects {
         pluginManager.apply("maven-publish")
         pluginManager.apply("signing")
 
+        dependencies {
+            add("testImplementation", "junit:junit:4.13.2")
+            add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
+        }
+
         extensions.configure(LibraryExtension::class.java) {
             publishing {
                 singleVariant("release") {
