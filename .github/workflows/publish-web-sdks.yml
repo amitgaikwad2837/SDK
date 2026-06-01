@@ -80,11 +80,14 @@ jobs:
         working-directory: projects/${{ matrix.sdk }}
         run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
 
+      - name: Configure npm registry auth
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          cat ~/.npmrc
+
       - name: Publish to npm
         working-directory: projects/${{ matrix.sdk }}
         run: npm publish --tag ${{ steps.version.outputs.dist_tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish notification
         run: |
