@@ -50,13 +50,37 @@ jobs:
       - name: Determine version
         id: version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ -z "${{ github.event.inputs.version }}" ]; then
+              echo "::error::workflow_dispatch requires a non-SNAPSHOT version input (for example: 1.0.0)."
+              exit 1
+            fi
             echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           else
             echo "version=0.0.${{ github.run_number }}-SNAPSHOT" >> $GITHUB_OUTPUT
           fi
+
+      - name: Validate publish credentials
+        if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
+        run: |
+          missing=0
+          for var in CENTRAL_PORTAL_USERNAME CENTRAL_PORTAL_PASSWORD SIGNING_KEY SIGNING_KEY_ID SIGNING_PASSWORD; do
+            if [ -z "${!var}" ]; then
+              echo "::error::Missing required secret: $var"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+        env:
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
 
       - name: Build with Gradle
         run: gradle :${{ matrix.sdk }}:build -Pversion=${{ steps.version.outputs.version }}
@@ -65,7 +89,7 @@ jobs:
         run: gradle :${{ matrix.sdk }}:test -Pversion=${{ steps.version.outputs.version }}
 
       - name: Publish to Maven Central
-        continue-on-error: true
+        if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
         run: gradle :${{ matrix.sdk }}:publish -Pversion=${{ steps.version.outputs.version }}
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
@@ -77,6 +101,12 @@ jobs:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
 
       - name: Publish notification
+        if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
         run: |
           echo "Published ${{ matrix.sdk }}:${{ steps.version.outputs.version }} to Maven Central"
           echo "https://central.sonatype.com/artifact/io.github.amitgaikwad2837/${{ matrix.sdk }}"
+
+      - name: Snapshot publish skipped
+        if: ${{ endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
+        run: |
+          echo "Skipping Maven Central publish for snapshot version ${{ steps.version.outputs.version }}"
