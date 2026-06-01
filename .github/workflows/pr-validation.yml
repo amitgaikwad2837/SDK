@@ -1,0 +1,46 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: ${{ github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.7'
+
+      - name: Build and test all Android SDK modules
+        run: |
+          set -euo pipefail
+          VERSION="0.0.0-pr.${{ github.event.number }}"
+          for sdk in \
+            android-ai-provider-core \
+            android-emergency-sos-sdk \
+            android-fall-detection-sdk \
+            android-distress-detection-sdk \
+            android-voice-assistant-sdk \
+            android-ocr-explain-sdk \
+            android-accessibility-assistant-sdk \
+            android-vision-assistance-sdk; do
+            echo "Validating $sdk"
+            gradle :$sdk:build :$sdk:test -Pversion=$VERSION
+          done
