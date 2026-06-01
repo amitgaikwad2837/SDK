@@ -58,21 +58,19 @@ jobs:
           fi
 
       - name: Build with Gradle
-        working-directory: projects/${{ matrix.sdk }}
-        run: gradle build -Pversion=${{ steps.version.outputs.version }}
+        run: gradle :${{ matrix.sdk }}:build -Pversion=${{ steps.version.outputs.version }}
 
       - name: Run tests
-        working-directory: projects/${{ matrix.sdk }}
-        run: gradle test
+        run: gradle :${{ matrix.sdk }}:test -Pversion=${{ steps.version.outputs.version }}
 
       - name: Publish to Maven Central
-        working-directory: projects/${{ matrix.sdk }}
-        run: gradle publish -Pversion=${{ steps.version.outputs.version }}
+        run: gradle :${{ matrix.sdk }}:publish -Pversion=${{ steps.version.outputs.version }}
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
 
