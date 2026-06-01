@@ -1,13 +1,18 @@
 ﻿# Prompt Testing Framework
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/prompt-testing-framework](https://www.npmjs.com/package/@amitgaikwad37/prompt-testing-framework)
+- **GitHub**: [amitgaikwad2837/prompt-testing-framework](https://github.com/amitgaikwad2837/prompt-testing-framework)
+
 ## Overview
 
-Evaluate prompts with repeatable scoring and regression comparisons.
+Test and evaluate LLM prompts with scoring, benchmarking, and comparison tools. Ensure prompt quality and consistency across versions before production deployment.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/prompt-testing-framework
+npm install @amitgaikwad37/prompt-testing-framework
 ~~~
 
 ## Quick Start

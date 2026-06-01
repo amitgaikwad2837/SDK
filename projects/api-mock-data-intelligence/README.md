@@ -1,13 +1,18 @@
 ﻿# API Mock Data Intelligence
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/api-mock-data-intelligence](https://www.npmjs.com/package/@amitgaikwad37/api-mock-data-intelligence)
+- **GitHub**: [amitgaikwad2837/api-mock-data-intelligence](https://github.com/amitgaikwad2837/api-mock-data-intelligence)
+
 ## Overview
 
-Create realistic mock payloads from API contracts and schema hints.
+Generate intelligent, context-aware mock data from API schemas and models. Uses Faker.js with locale-specific rules to create realistic test data that improves test coverage and confidence.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/api-mock-data-intelligence
+npm install @amitgaikwad37/api-mock-data-intelligence
 ~~~
 
 ## Quick Start

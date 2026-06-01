@@ -1,13 +1,18 @@
 ﻿# Pull Request Reviewer Agent
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/pull-request-reviewer-agent](https://www.npmjs.com/package/@amitgaikwad37/pull-request-reviewer-agent)
+- **GitHub**: [amitgaikwad2837/pull-request-reviewer-agent](https://github.com/amitgaikwad2837/pull-request-reviewer-agent)
+
 ## Overview
 
-Automate PR review checks and produce structured reviewer feedback.
+Automate code reviews with AI-powered analysis of pull requests. Checks for best practices, security issues, performance improvements, and style violations to accelerate review cycles.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/pull-request-reviewer-agent
+npm install @amitgaikwad37/pull-request-reviewer-agent
 ~~~
 
 ## Quick Start

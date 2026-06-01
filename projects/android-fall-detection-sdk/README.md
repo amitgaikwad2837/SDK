@@ -1,16 +1,21 @@
 ﻿# Android Fall Detection SDK
 
+## 📦 Registry & Repository
+
+- **Maven Central**: [io.github.amitgaikwad2837:android-fall-detection-sdk](https://central.sonatype.com/artifact/io.github.amitgaikwad2837/android-fall-detection-sdk)
+- **GitHub**: [amitgaikwad2837/android-fall-detection-sdk](https://github.com/amitgaikwad2837/android-fall-detection-sdk)
+
 ## Overview
 
-Real-time fall detection for elderly and worker safety
+Real-time fall detection using device accelerometer data. Automatically triggers alerts and notifications when falls are detected, with high accuracy and low false positives. Ideal for elderly care and worker safety applications.
 
 ## Installation
 
-Add the Maven dependency once artifacts are published:
+Add the Maven dependency:
 
 ~~~kotlin
 dependencies {
-  implementation("io.github.amitgaikwad2837:android-fall-detection-sdk:1.0.0")
+  implementation("io.github.amitgaikwad2837:android-fall-detection-sdk:0.0.9")
 }
 ~~~
 

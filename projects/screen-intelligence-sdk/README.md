@@ -1,13 +1,18 @@
 ﻿# Screen Intelligence SDK
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/screen-intelligence-sdk](https://www.npmjs.com/package/@amitgaikwad37/screen-intelligence-sdk)
+- **GitHub**: [amitgaikwad2837/screen-intelligence-sdk](https://github.com/amitgaikwad2837/screen-intelligence-sdk)
+
 ## Overview
 
-Analyze UI screens and return structured design and usability signals.
+Analyze UI screenshots and wireframes for design patterns, accessibility, responsiveness, and consistency. Extract insights from visual designs to improve quality and user experience.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/screen-intelligence-sdk
+npm install @amitgaikwad37/screen-intelligence-sdk
 ~~~
 
 ## Quick Start

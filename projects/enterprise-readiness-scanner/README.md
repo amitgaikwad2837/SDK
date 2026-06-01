@@ -1,13 +1,18 @@
 ﻿# Enterprise Readiness Scanner
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/enterprise-readiness-scanner](https://www.npmjs.com/package/@amitgaikwad37/enterprise-readiness-scanner)
+- **GitHub**: [amitgaikwad2837/enterprise-readiness-scanner](https://github.com/amitgaikwad2837/enterprise-readiness-scanner)
+
 ## Overview
 
-Scan projects for enterprise-readiness signals including security and compliance checks.
+Audit applications against enterprise standards including OWASP security, accessibility compliance, performance baselines, and operational readiness. Provides scorecards and actionable recommendations.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/enterprise-readiness-scanner
+npm install @amitgaikwad37/enterprise-readiness-scanner
 ~~~
 
 ## Quick Start

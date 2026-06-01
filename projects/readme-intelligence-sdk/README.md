@@ -1,13 +1,18 @@
 ﻿# README Intelligence SDK
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/readme-intelligence-sdk](https://www.npmjs.com/package/@amitgaikwad37/readme-intelligence-sdk)
+- **GitHub**: [amitgaikwad2837/readme-intelligence-sdk](https://github.com/amitgaikwad2837/readme-intelligence-sdk)
+
 ## Overview
 
-Keep README content aligned with implementation and release changes.
+Keep README documentation synchronized with code changes, API updates, and implementation details. Automatically validate and refresh documentation to reduce manual sync overhead.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/readme-intelligence-sdk
+npm install @amitgaikwad37/readme-intelligence-sdk
 ~~~
 
 ## Quick Start

@@ -1,13 +1,18 @@
 ﻿# Architecture Decision Record Generator
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/architecture-decision-record-generator](https://www.npmjs.com/package/@amitgaikwad37/architecture-decision-record-generator)
+- **GitHub**: [amitgaikwad2837/architecture-decision-record-generator](https://github.com/amitgaikwad2837/architecture-decision-record-generator)
+
 ## Overview
 
-Generate ADR documents from pull request and design inputs.
+Automatically generate Architecture Decision Records (ADRs) from pull request metadata and commit history. Helps teams document technical decisions, rationale, and consequences for future reference.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/architecture-decision-record-generator
+npm install @amitgaikwad37/architecture-decision-record-generator
 ~~~
 
 ## Quick Start

@@ -1,13 +1,18 @@
 ﻿# Frontend UX Linter
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/frontend-ux-linter](https://www.npmjs.com/package/@amitgaikwad37/frontend-ux-linter)
+- **GitHub**: [amitgaikwad2837/frontend-ux-linter](https://github.com/amitgaikwad2837/frontend-ux-linter)
+
 ## Overview
 
-Lint UI and accessibility patterns and report actionable UX issues.
+Lint and validate UI/UX patterns including accessibility (WCAG), responsive design, performance, and design consistency. Catch user experience issues early in development.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/frontend-ux-linter
+npm install @amitgaikwad37/frontend-ux-linter
 ~~~
 
 ## Quick Start

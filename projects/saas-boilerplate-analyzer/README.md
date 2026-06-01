@@ -1,13 +1,18 @@
 ﻿# SaaS Boilerplate Analyzer
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/saas-boilerplate-analyzer](https://www.npmjs.com/package/@amitgaikwad37/saas-boilerplate-analyzer)
+- **GitHub**: [amitgaikwad2837/saas-boilerplate-analyzer](https://github.com/amitgaikwad2837/saas-boilerplate-analyzer)
+
 ## Overview
 
-Audit SaaS starter projects for architecture and production gaps.
+Audit SaaS applications against common boilerplate patterns and best practices. Identify missing features, architectural gaps, and compliance requirements for production-grade SaaS.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/saas-boilerplate-analyzer
+npm install @amitgaikwad37/saas-boilerplate-analyzer
 ~~~
 
 ## Quick Start

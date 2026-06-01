@@ -1,13 +1,18 @@
 ﻿# AI SDK Internal Tools
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/ai-sdk-internal-tools](https://www.npmjs.com/package/@amitgaikwad37/ai-sdk-internal-tools)
+- **GitHub**: [amitgaikwad2837/ai-sdk-internal-tools](https://github.com/amitgaikwad2837/ai-sdk-internal-tools)
+
 ## Overview
 
-Provide utility workflows used to develop and validate AI SDK pipelines.
+Internal development and DevOps tools for AI workflow automation. Utilities for prompt management, model evaluation, pipeline orchestration, and observability.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/ai-sdk-internal-tools
+npm install @amitgaikwad37/ai-sdk-internal-tools
 ~~~
 
 ## Quick Start

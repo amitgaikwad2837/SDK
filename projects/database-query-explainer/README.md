@@ -1,13 +1,18 @@
 ﻿# Database Query Explainer
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/database-query-explainer](https://www.npmjs.com/package/@amitgaikwad37/database-query-explainer)
+- **GitHub**: [amitgaikwad2837/database-query-explainer](https://github.com/amitgaikwad2837/database-query-explainer)
+
 ## Overview
 
-Explain SQL queries and suggest performance and readability improvements.
+Analyze and explain SQL queries with performance insights and optimization recommendations. Supports multiple database dialects and integrates with CI/CD for continuous query quality monitoring.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/database-query-explainer
+npm install @amitgaikwad37/database-query-explainer
 ~~~
 
 ## Quick Start

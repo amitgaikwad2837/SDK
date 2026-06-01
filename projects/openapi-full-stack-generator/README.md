@@ -1,13 +1,18 @@
 ﻿# OpenAPI Full Stack Generator
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/openapi-full-stack-generator](https://www.npmjs.com/package/@amitgaikwad37/openapi-full-stack-generator)
+- **GitHub**: [amitgaikwad2837/openapi-full-stack-generator](https://github.com/amitgaikwad2837/openapi-full-stack-generator)
+
 ## Overview
 
-Generate backend and frontend starter components from OpenAPI definitions.
+Generate complete full-stack applications (frontend + backend + database schemas) from OpenAPI specifications. Reduces boilerplate and accelerates API-driven development.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/openapi-full-stack-generator
+npm install @amitgaikwad37/openapi-full-stack-generator
 ~~~
 
 ## Quick Start

@@ -1,13 +1,18 @@
 ﻿# Production Incident Copilot
 
+## 📦 Registry & Repository
+
+- **npm**: [@amitgaikwad37/production-incident-copilot](https://www.npmjs.com/package/@amitgaikwad37/production-incident-copilot)
+- **GitHub**: [amitgaikwad2837/production-incident-copilot](https://github.com/amitgaikwad2837/production-incident-copilot)
+
 ## Overview
 
-Analyze incident context from logs and produce triage-focused diagnostics.
+Analyze production logs and error traces to identify root causes and suggest remediation steps. AI-powered incident response to reduce MTTR and improve reliability.
 
 ## Installation
 
 ~~~bash
-npm install @public-sdk/production-incident-copilot
+npm install @amitgaikwad37/production-incident-copilot
 ~~~
 
 ## Quick Start
