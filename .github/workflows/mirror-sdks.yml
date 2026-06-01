@@ -50,13 +50,22 @@ jobs:
           fetch-depth: 0
 
       - name: Mirror ${{ matrix.sdk.folder }} to ${{ matrix.sdk.repo }}
+        id: mirror
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIRROR_TOKEN: ${{ secrets.MIRROR_REPO_TOKEN }}
           SDK_FOLDER: ${{ matrix.sdk.folder }}
           SDK_REPO: ${{ matrix.sdk.repo }}
           ORG: ${{ github.repository_owner }}
         run: |
           set -e
+
+          if [ -z "$MIRROR_TOKEN" ]; then
+            echo "ERROR: Missing MIRROR_REPO_TOKEN secret in the monorepo."
+            exit 1
+          fi
+
+          echo "repo_url=https://github.com/$ORG/$SDK_REPO" >> "$GITHUB_OUTPUT"
+          echo "source_sha=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           
           # Create temp directories
           mkdir -p /tmp/sdk-mirror /tmp/sdk-repo
@@ -68,14 +77,16 @@ jobs:
           # Clone target repo
           echo "🔗 Cloning target repo..."
           cd /tmp/sdk-repo
-          git clone --depth 1 "https://github.com/$ORG/$SDK_REPO.git" . 2>&1 || true
+          git clone --depth 1 "https://x-access-token:$MIRROR_TOKEN@github.com/$ORG/$SDK_REPO.git" . 2>&1 || true
           
           # Initialize if new repo
           if [ ! -d .git ]; then
             echo "🆕 Initializing new repository..."
             git init
-            git remote add origin "https://github.com/$ORG/$SDK_REPO.git"
+            git remote add origin "https://x-access-token:$MIRROR_TOKEN@github.com/$ORG/$SDK_REPO.git"
           fi
+
+          git checkout -B main
           
           # Configure git
           git config user.email "github-actions@github.com"
@@ -92,13 +103,21 @@ jobs:
           
           if git commit -m "Mirror from monorepo ($(date +%Y-%m-%d)) - ${{ github.sha }}"; then
             echo "🚀 Pushing to $SDK_REPO..."
-            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$ORG/$SDK_REPO.git" main 2>&1 || \
-            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$ORG/$SDK_REPO.git" master 2>&1 || \
-            echo "⚠️ Push failed (repo may not have main/master branch yet)"
+            git push origin main 2>&1
+            echo "push_status=pushed" >> "$GITHUB_OUTPUT"
           else
             echo "✓ No changes to commit"
+            echo "push_status=no_changes" >> "$GITHUB_OUTPUT"
           fi
+
+          echo "target_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Summary
         if: always()
-        run: echo "✅ Mirror job complete for ${{ matrix.sdk.repo }}"
+        run: |
+          echo "### Mirror Result: ${{ matrix.sdk.repo }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source SDK folder: ${{ matrix.sdk.folder }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Target repo: ${{ steps.mirror.outputs.repo_url }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Source commit: ${{ steps.mirror.outputs.source_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mirrored commit: ${{ steps.mirror.outputs.target_sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Push status: ${{ steps.mirror.outputs.push_status }}" >> "$GITHUB_STEP_SUMMARY"
