@@ -125,7 +125,7 @@ jobs:
             echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Promote validated deployments in Sonatype
+      - name: Upload OSSRH staging repositories to Portal
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
@@ -133,73 +133,50 @@ jobs:
         run: |
           set -euo pipefail
           AUTH=$(printf "%s:%s" "$CENTRAL_PORTAL_USERNAME" "$CENTRAL_PORTAL_PASSWORD" | base64 | tr -d '\n')
-          API_BASE="https://central.sonatype.com/api/v1/publisher"
-          GROUP_ID="io.github.amitgaikwad2837"
+          API_BASE="https://ossrh-staging-api.central.sonatype.com"
+          NAMESPACE="io.github.amitgaikwad2837"
 
-          echo "Looking for VALIDATED deployments for $GROUP_ID version $VERSION"
-          deployment_ids=""
+          echo "Looking for OSSRH staging repositories for namespace $NAMESPACE"
+          repo_keys=""
 
           for attempt in $(seq 1 20); do
-            echo "Attempt $attempt/20: querying deployment list"
+            echo "Attempt $attempt/20: querying manual search API"
             json=$(curl -fsS \
               -H "Authorization: Bearer $AUTH" \
-              "$API_BASE/deployments")
+              "$API_BASE/manual/search/repositories?ip=any&profile_id=$NAMESPACE")
 
-            deployment_ids=$(echo "$json" | jq -r --arg group "$GROUP_ID" --arg version "$VERSION" '
-              [
-                .. | objects
-                | . as $obj
-                | ($obj.deploymentState // $obj.state // "") as $state
-                | ($obj.deploymentId // $obj.id // "") as $id
-                | ($obj.namespace // $obj.groupId // $obj.group // "") as $ns
-                | ($obj.version // "") as $ver
-                | ($obj.purls // []) as $purls
-                | select($state == "VALIDATED")
-                | select($id != "")
-                | select(
-                    ($ns == $group)
-                    or ([$purls[]? | tostring] | join(" ") | contains($group))
-                  )
-                | select(
-                    ($ver == $version)
-                    or ([$purls[]? | tostring] | join(" ") | contains("@" + $version))
-                  )
-                | $id
-              ]
-              | unique
-              | .[]
-            ')
+            repo_keys=$(echo "$json" | jq -r '.repositories[]? | select(.state == "open" or .state == "closed") | .key' | sort -u)
 
-            if [ -n "$deployment_ids" ]; then
+            if [ -n "$repo_keys" ]; then
               break
             fi
 
-            sleep 20
+            sleep 15
           done
 
-          if [ -z "$deployment_ids" ]; then
-            echo "::error::No VALIDATED deployment IDs found for $GROUP_ID version $VERSION."
-            echo "::error::Uploads may still be processing or did not register as deployable Portal deployments."
+          if [ -z "$repo_keys" ]; then
+            echo "::error::No open/closed staging repositories were found for namespace $NAMESPACE."
+            echo "::error::Manual upload to Central Portal cannot proceed."
             exit 1
           fi
 
-          echo "Promoting deployment IDs:"
-          echo "$deployment_ids"
+          echo "Uploading repositories to Central Portal with automatic publishing:"
+          echo "$repo_keys"
 
-          while IFS= read -r dep_id; do
-            [ -z "$dep_id" ] && continue
-            echo "Promoting deployment $dep_id"
-            http_code=$(curl -sS -o /tmp/promote-response.txt -w "%{http_code}" \
+          while IFS= read -r repo_key; do
+            [ -z "$repo_key" ] && continue
+            echo "Uploading repository $repo_key"
+            http_code=$(curl -sS -o /tmp/manual-upload-response.txt -w "%{http_code}" \
               -X POST \
               -H "Authorization: Bearer $AUTH" \
-              "$API_BASE/deployment/$dep_id")
+              "$API_BASE/manual/upload/repository/$repo_key?publishing_type=automatic")
 
-            if [ "$http_code" != "204" ] && [ "$http_code" != "200" ]; then
-              echo "::error::Failed to promote deployment $dep_id (HTTP $http_code)."
-              cat /tmp/promote-response.txt || true
+            if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+              echo "::error::Failed to upload repository $repo_key to Portal (HTTP $http_code)."
+              cat /tmp/manual-upload-response.txt || true
               exit 1
             fi
-          done <<< "$deployment_ids"
+          done <<< "$repo_keys"
 
       - name: Verify visibility in Maven Central
         env:
@@ -209,10 +186,10 @@ jobs:
           GROUP_ID="io.github.amitgaikwad2837"
 
           echo "Waiting for Maven Central indexing of $GROUP_ID:$VERSION"
-          for attempt in $(seq 1 45); do
+          for attempt in $(seq 1 60); do
             response=$(curl -fsS "https://search.maven.org/solrsearch/select?q=g:%22$GROUP_ID%22+AND+v:%22$VERSION%22&rows=20&wt=json")
             found=$(echo "$response" | jq -r '.response.numFound // 0')
-            echo "Attempt $attempt/45: numFound=$found"
+            echo "Attempt $attempt/60: numFound=$found"
 
             if [ "$found" -gt 0 ]; then
               echo "Maven Central now lists $GROUP_ID version $VERSION"
