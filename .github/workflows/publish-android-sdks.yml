@@ -20,6 +20,7 @@ jobs:
   publish-android-sdks:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         sdk:
           - android-ai-provider-core
@@ -64,6 +65,7 @@ jobs:
         run: gradle :${{ matrix.sdk }}:test -Pversion=${{ steps.version.outputs.version }}
 
       - name: Publish to Maven Central
+        continue-on-error: true
         run: gradle :${{ matrix.sdk }}:publish -Pversion=${{ steps.version.outputs.version }}
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}

@@ -21,6 +21,7 @@ jobs:
   publish-web-sdks:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         sdk:
           - api-contract-drift-detector
@@ -78,6 +79,7 @@ jobs:
         run: npm version ${{ steps.version.outputs.version }} --workspace projects/${{ matrix.sdk }} --no-git-tag-version
 
       - name: Publish to npm
+        continue-on-error: true
         run: npm publish --workspace projects/${{ matrix.sdk }} --tag ${{ steps.version.outputs.dist_tag }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
