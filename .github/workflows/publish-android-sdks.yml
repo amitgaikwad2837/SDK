@@ -41,6 +41,11 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      - name: Set up Gradle
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gradle
+
       - name: Determine version
         id: version
         run: |
@@ -54,15 +59,15 @@ jobs:
 
       - name: Build with Gradle
         working-directory: projects/${{ matrix.sdk }}
-        run: chmod +x gradlew && ./gradlew build -Pversion=${{ steps.version.outputs.version }}
+        run: gradle build -Pversion=${{ steps.version.outputs.version }}
 
       - name: Run tests
         working-directory: projects/${{ matrix.sdk }}
-        run: ./gradlew test
+        run: gradle test
 
       - name: Publish to Maven Central
         working-directory: projects/${{ matrix.sdk }}
-        run: ./gradlew publish -Pversion=${{ steps.version.outputs.version }}
+        run: gradle publish -Pversion=${{ steps.version.outputs.version }}
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
