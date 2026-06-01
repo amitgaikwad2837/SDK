@@ -9,6 +9,9 @@ param(
     [string]$CentralPortalUsername = "",
     [Alias("SonatypePassword")]
     [string]$CentralPortalPassword = "",
+    [string]$SigningKey = "",
+    [string]$SigningKeyId = "",
+    [string]$SigningPassword = "",
     [switch]$SkipGitHub,
     [switch]$SkipSecrets
 )
@@ -115,6 +118,27 @@ if (-not $SkipSecrets) {
             gh secret set SONATYPE_PASSWORD -b $CentralPortalPassword -R "$GitHubOrg/$sdk" 2>$null
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "    (Could not set SONATYPE_PASSWORD compatibility secret)" -ForegroundColor Yellow
+            }
+
+            if ($SigningKey) {
+                gh secret set SIGNING_KEY -b $SigningKey -R "$GitHubOrg/$sdk" 2>$null
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "    (Could not set SIGNING_KEY)" -ForegroundColor Yellow
+                }
+            }
+
+            if ($SigningKeyId) {
+                gh secret set SIGNING_KEY_ID -b $SigningKeyId -R "$GitHubOrg/$sdk" 2>$null
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "    (Could not set SIGNING_KEY_ID)" -ForegroundColor Yellow
+                }
+            }
+
+            if ($SigningPassword) {
+                gh secret set SIGNING_PASSWORD -b $SigningPassword -R "$GitHubOrg/$sdk" 2>$null
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "    (Could not set SIGNING_PASSWORD)" -ForegroundColor Yellow
+                }
             }
         }
     }
