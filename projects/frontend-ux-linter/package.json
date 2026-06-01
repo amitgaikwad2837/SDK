@@ -1,6 +1,5 @@
 {
-  "name": "@public-sdk/frontend-ux-linter",
-  "private": true,
+  "name": "@public-sdk/frontend-ux-linter"
   "version": "0.1.0",
   "type": "module",
   "description": "Frontend Ux Linter starter implementation scaffold",
@@ -26,3 +25,4 @@
     "vitest": "^2.1.8"
   }
 }
+

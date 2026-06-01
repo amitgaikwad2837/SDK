@@ -1,6 +1,5 @@
 {
-  "name": "@public-sdk/production-incident-copilot",
-  "private": true,
+  "name": "@public-sdk/production-incident-copilot"
   "version": "0.1.0",
   "type": "module",
   "description": "Production Incident Copilot starter implementation scaffold",
@@ -26,3 +25,4 @@
     "vitest": "^2.1.8"
   }
 }
+
