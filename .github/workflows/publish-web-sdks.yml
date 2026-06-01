@@ -2,13 +2,16 @@ name: Publish Web SDKs to npm
 
 on:
   push:
+    branches: [main]
+    paths:
+      - 'projects/**'
     tags:
       - 'v*'
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish'
-        required: true
+        description: 'Version to publish (e.g. 1.0.0)'
+        required: false
 
 permissions:
   contents: read
@@ -46,6 +49,21 @@ jobs:
           node-version: '18'
           registry-url: 'https://registry.npmjs.org/'
 
+      - name: Determine version and dist-tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+            echo "dist_tag=latest" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+            echo "dist_tag=latest" >> $GITHUB_OUTPUT
+          else
+            BASE=$(node -p "require('./projects/${{ matrix.sdk }}/package.json').version" 2>/dev/null || echo "0.0.0")
+            echo "version=${BASE}-beta.${{ github.run_number }}" >> $GITHUB_OUTPUT
+            echo "dist_tag=next" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install dependencies
         working-directory: projects/${{ matrix.sdk }}
         run: npm ci
@@ -58,13 +76,17 @@ jobs:
         working-directory: projects/${{ matrix.sdk }}
         run: npm run build
 
+      - name: Set version
+        working-directory: projects/${{ matrix.sdk }}
+        run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+
       - name: Publish to npm
         working-directory: projects/${{ matrix.sdk }}
-        run: npm publish
+        run: npm publish --tag ${{ steps.version.outputs.dist_tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish notification
         run: |
-          echo "✅ Published ${{ matrix.sdk }} to npm"
-          echo "📦 https://www.npmjs.com/package/@your-org/${{ matrix.sdk }}"
+          echo "Published ${{ matrix.sdk }}@${{ steps.version.outputs.version }} to npm (tag: ${{ steps.version.outputs.dist_tag }})"
+          echo "https://www.npmjs.com/package/${{ matrix.sdk }}"
