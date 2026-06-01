@@ -17,18 +17,6 @@ permissions:
 jobs:
   publish-android-sdks:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        sdk:
-          - android-ai-provider-core
-          - android-emergency-sos-sdk
-          - android-fall-detection-sdk
-          - android-distress-detection-sdk
-          - android-voice-assistant-sdk
-          - android-ocr-explain-sdk
-          - android-accessibility-assistant-sdk
-          - android-vision-assistance-sdk
 
     steps:
       - name: Checkout
@@ -81,14 +69,53 @@ jobs:
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
 
       - name: Build with Gradle
-        run: gradle :${{ matrix.sdk }}:build -Pversion=${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          for sdk in \
+            android-ai-provider-core \
+            android-emergency-sos-sdk \
+            android-fall-detection-sdk \
+            android-distress-detection-sdk \
+            android-voice-assistant-sdk \
+            android-ocr-explain-sdk \
+            android-accessibility-assistant-sdk \
+            android-vision-assistance-sdk; do
+            echo "Building $sdk"
+            gradle :$sdk:build -Pversion=${{ steps.version.outputs.version }}
+          done
 
       - name: Run tests
-        run: gradle :${{ matrix.sdk }}:test -Pversion=${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          for sdk in \
+            android-ai-provider-core \
+            android-emergency-sos-sdk \
+            android-fall-detection-sdk \
+            android-distress-detection-sdk \
+            android-voice-assistant-sdk \
+            android-ocr-explain-sdk \
+            android-accessibility-assistant-sdk \
+            android-vision-assistance-sdk; do
+            echo "Testing $sdk"
+            gradle :$sdk:test -Pversion=${{ steps.version.outputs.version }}
+          done
 
       - name: Publish to Maven Central
         if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
-        run: gradle :${{ matrix.sdk }}:publish -Pversion=${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          for sdk in \
+            android-ai-provider-core \
+            android-emergency-sos-sdk \
+            android-fall-detection-sdk \
+            android-distress-detection-sdk \
+            android-voice-assistant-sdk \
+            android-ocr-explain-sdk \
+            android-accessibility-assistant-sdk \
+            android-vision-assistance-sdk; do
+            echo "Publishing $sdk"
+            gradle :$sdk:publish -Pversion=${{ steps.version.outputs.version }}
+          done
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
@@ -101,9 +128,9 @@ jobs:
       - name: Publish notification
         if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
         run: |
-          echo "Uploaded ${{ matrix.sdk }}:${{ steps.version.outputs.version }} to Sonatype staging"
+          echo "Uploaded SDK modules version ${{ steps.version.outputs.version }} to Sonatype staging"
           echo "If not visible in Maven Central yet, release may still be processing in Sonatype"
-          echo "https://central.sonatype.com/artifact/io.github.amitgaikwad2837/${{ matrix.sdk }}"
+          echo "https://central.sonatype.com/search?q=io.github.amitgaikwad2837"
 
       - name: Snapshot publish skipped
         if: ${{ endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
@@ -125,7 +152,7 @@ jobs:
             echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Upload OSSRH staging repositories to Portal
+      - name: Upload default OSSRH repository to Portal
         env:
           CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
           CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
@@ -136,47 +163,17 @@ jobs:
           API_BASE="https://ossrh-staging-api.central.sonatype.com"
           NAMESPACE="io.github.amitgaikwad2837"
 
-          echo "Looking for OSSRH staging repositories for namespace $NAMESPACE"
-          repo_keys=""
+          echo "Uploading default repository for namespace $NAMESPACE with automatic publishing"
+          http_code=$(curl -sS -o /tmp/manual-upload-response.txt -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer $AUTH" \
+            "$API_BASE/manual/upload/defaultRepository/$NAMESPACE?publishing_type=automatic")
 
-          for attempt in $(seq 1 20); do
-            echo "Attempt $attempt/20: querying manual search API"
-            json=$(curl -fsS \
-              -H "Authorization: Bearer $AUTH" \
-              "$API_BASE/manual/search/repositories?ip=any&profile_id=$NAMESPACE")
-
-            repo_keys=$(echo "$json" | jq -r '.repositories[]? | select(.state == "open" or .state == "closed") | .key' | sort -u)
-
-            if [ -n "$repo_keys" ]; then
-              break
-            fi
-
-            sleep 15
-          done
-
-          if [ -z "$repo_keys" ]; then
-            echo "::error::No open/closed staging repositories were found for namespace $NAMESPACE."
-            echo "::error::Manual upload to Central Portal cannot proceed."
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "::error::Failed to upload default repository to Portal (HTTP $http_code)."
+            cat /tmp/manual-upload-response.txt || true
             exit 1
           fi
-
-          echo "Uploading repositories to Central Portal with automatic publishing:"
-          echo "$repo_keys"
-
-          while IFS= read -r repo_key; do
-            [ -z "$repo_key" ] && continue
-            echo "Uploading repository $repo_key"
-            http_code=$(curl -sS -o /tmp/manual-upload-response.txt -w "%{http_code}" \
-              -X POST \
-              -H "Authorization: Bearer $AUTH" \
-              "$API_BASE/manual/upload/repository/$repo_key?publishing_type=automatic")
-
-            if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-              echo "::error::Failed to upload repository $repo_key to Portal (HTTP $http_code)."
-              cat /tmp/manual-upload-response.txt || true
-              exit 1
-            fi
-          done <<< "$repo_keys"
 
       - name: Verify visibility in Maven Central
         env:
