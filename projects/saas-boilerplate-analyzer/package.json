@@ -1,5 +1,5 @@
 {
-  "name": "@public-sdk/saas-boilerplate-analyzer"
+  "name": "@public-sdk/saas-boilerplate-analyzer",
   "version": "0.1.0",
   "type": "module",
   "description": "Saas Boilerplate Analyzer starter implementation scaffold",
@@ -25,4 +25,5 @@
     "vitest": "^2.1.8"
   }
 }
+
 

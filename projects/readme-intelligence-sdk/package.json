@@ -1,5 +1,5 @@
 {
-  "name": "@public-sdk/readme-intelligence-sdk"
+  "name": "@public-sdk/readme-intelligence-sdk",
   "version": "0.1.0",
   "type": "module",
   "description": "Readme Intelligence Sdk starter implementation scaffold",
@@ -25,4 +25,5 @@
     "vitest": "^2.1.8"
   }
 }
+
 

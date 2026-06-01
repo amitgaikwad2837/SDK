@@ -1,5 +1,5 @@
 {
-  "name": "@public-sdk/enterprise-readiness-scanner"
+  "name": "@public-sdk/enterprise-readiness-scanner",
   "version": "0.1.0",
   "type": "module",
   "description": "Enterprise Readiness Scanner starter implementation scaffold",
@@ -25,4 +25,5 @@
     "vitest": "^2.1.8"
   }
 }
+
 
