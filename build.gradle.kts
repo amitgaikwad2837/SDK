@@ -21,11 +21,6 @@ subprojects {
         pluginManager.apply("maven-publish")
         pluginManager.apply("signing")
 
-        dependencies {
-            add("testImplementation", "junit:junit:4.13.2")
-            add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
-        }
-
         extensions.configure(LibraryExtension::class.java) {
             publishing {
                 singleVariant("release") {
@@ -35,6 +30,11 @@ subprojects {
         }
 
         afterEvaluate {
+            // Add test dependencies
+            dependencies.add("testImplementation", "junit:junit:4.13.2")
+            dependencies.add("androidTestImplementation", "androidx.test.ext:junit:1.1.5")
+            dependencies.add("testImplementation", "org.junit.jupiter:junit-jupiter-api:5.9.2")
+
             extensions.configure(PublishingExtension::class.java) {
                 publications {
                     create("release", MavenPublication::class.java) {
