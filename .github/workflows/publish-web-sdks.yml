@@ -46,7 +46,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Determine version and dist-tag
@@ -64,30 +64,24 @@ jobs:
             echo "dist_tag=next" >> $GITHUB_OUTPUT
           fi
 
-      - name: Install dependencies
-        working-directory: projects/${{ matrix.sdk }}
-        run: npm ci
+      - name: Install workspace dependencies
+        run: npm install --workspace projects/${{ matrix.sdk }}
 
       - name: Run tests
-        working-directory: projects/${{ matrix.sdk }}
-        run: npm test
+        run: npm run test --workspace projects/${{ matrix.sdk }}
 
       - name: Build
-        working-directory: projects/${{ matrix.sdk }}
-        run: npm run build
+        run: npm run build --workspace projects/${{ matrix.sdk }}
 
       - name: Set version
-        working-directory: projects/${{ matrix.sdk }}
-        run: npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+        run: npm version ${{ steps.version.outputs.version }} --workspace projects/${{ matrix.sdk }} --no-git-tag-version
 
       - name: Configure npm registry auth
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-          cat ~/.npmrc
 
       - name: Publish to npm
-        working-directory: projects/${{ matrix.sdk }}
-        run: npm publish --tag ${{ steps.version.outputs.dist_tag }}
+        run: npm publish --workspace projects/${{ matrix.sdk }} --tag ${{ steps.version.outputs.dist_tag }}
 
       - name: Publish notification
         run: |
