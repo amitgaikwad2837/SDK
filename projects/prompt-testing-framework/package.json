@@ -1,5 +1,5 @@
 {
-  "name": "prompt-testing-framework",
+  "name": "@amitgaikwad2837/prompt-testing-framework",
   "version": "0.1.0",
   "type": "module",
   "description": "Prompt Testing Framework starter implementation scaffold",

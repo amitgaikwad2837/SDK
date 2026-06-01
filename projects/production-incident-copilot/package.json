@@ -1,5 +1,5 @@
 {
-  "name": "production-incident-copilot",
+  "name": "@amitgaikwad2837/production-incident-copilot",
   "version": "0.1.0",
   "type": "module",
   "description": "Production Incident Copilot starter implementation scaffold",

@@ -1,5 +1,5 @@
 {
-  "name": "frontend-ux-linter",
+  "name": "@amitgaikwad2837/frontend-ux-linter",
   "version": "0.1.0",
   "type": "module",
   "description": "Frontend Ux Linter starter implementation scaffold",

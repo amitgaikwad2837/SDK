@@ -1,5 +1,5 @@
 {
-  "name": "architecture-decision-record-generator",
+  "name": "@amitgaikwad2837/architecture-decision-record-generator",
   "version": "0.1.0",
   "type": "module",
   "description": "Architecture Decision Record Generator starter implementation scaffold",

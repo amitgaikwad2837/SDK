@@ -81,9 +81,9 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish to npm
-        run: npm publish --workspace projects/${{ matrix.sdk }} --tag ${{ steps.version.outputs.dist_tag }}
+        run: npm publish --workspace projects/${{ matrix.sdk }} --tag ${{ steps.version.outputs.dist_tag }} --access public
 
       - name: Publish notification
         run: |
           echo "Published ${{ matrix.sdk }}@${{ steps.version.outputs.version }} to npm (tag: ${{ steps.version.outputs.dist_tag }})"
-          echo "https://www.npmjs.com/package/${{ matrix.sdk }}"
+          echo "https://www.npmjs.com/package/@amitgaikwad2837/${{ matrix.sdk }}"

@@ -1,5 +1,5 @@
 {
-  "name": "screen-intelligence-sdk",
+  "name": "@amitgaikwad2837/screen-intelligence-sdk",
   "version": "0.1.0",
   "type": "module",
   "description": "Screen Intelligence Sdk starter implementation scaffold",
