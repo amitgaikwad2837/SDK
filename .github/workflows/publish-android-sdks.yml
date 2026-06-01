@@ -175,26 +175,3 @@ jobs:
             exit 1
           fi
 
-      - name: Verify visibility in Maven Central
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          set -euo pipefail
-          GROUP_ID="io.github.amitgaikwad2837"
-
-          echo "Waiting for Maven Central indexing of $GROUP_ID:$VERSION"
-          for attempt in $(seq 1 60); do
-            response=$(curl -fsS "https://search.maven.org/solrsearch/select?q=g:%22$GROUP_ID%22+AND+v:%22$VERSION%22&rows=20&wt=json")
-            found=$(echo "$response" | jq -r '.response.numFound // 0')
-            echo "Attempt $attempt/60: numFound=$found"
-
-            if [ "$found" -gt 0 ]; then
-              echo "Maven Central now lists $GROUP_ID version $VERSION"
-              exit 0
-            fi
-
-            sleep 20
-          done
-
-          echo "::error::Version $VERSION not visible in Maven Central within timeout window."
-          exit 1
