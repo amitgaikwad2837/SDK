@@ -1,17 +1,15 @@
 name: Publish Android SDKs to Maven Central
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'projects/android-**'
-    tags:
-      - 'v*'
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to publish (e.g. 1.0.0)'
-        required: false
+        required: true
+  push:
+    branches: [main]
+    paths:
+      - 'projects/android-**'
 
 permissions:
   contents: read
