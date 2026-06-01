@@ -48,6 +48,7 @@ jobs:
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org/'
+          always-auth: true
 
       - name: Determine version and dist-tag
         id: version
@@ -76,12 +77,10 @@ jobs:
       - name: Set version
         run: npm version ${{ steps.version.outputs.version }} --workspace projects/${{ matrix.sdk }} --no-git-tag-version
 
-      - name: Configure npm registry auth
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Publish to npm
         run: npm publish --workspace projects/${{ matrix.sdk }} --tag ${{ steps.version.outputs.dist_tag }} --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish notification
         run: |
