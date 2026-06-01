@@ -98,24 +98,6 @@ jobs:
           SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
           SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
 
-      - name: Release from staging
-        if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
-        run: |
-          # Give staging repository a moment to be indexed
-          sleep 10
-          
-          # Release all deployments for this namespace using Basic auth
-          CREDENTIALS=$(echo -n "${{ secrets.CENTRAL_PORTAL_USERNAME }}:${{ secrets.CENTRAL_PORTAL_PASSWORD }}" | base64)
-          
-          curl -X POST \
-            -H "Authorization: Basic $CREDENTIALS" \
-            -H "Content-Type: application/json" \
-            "https://central.sonatype.com/api/v1/publisher/deployment/publish" \
-            -d '{"deploymentName":"io.github.amitgaikwad2837"}' \
-            -w "\nHTTP Status: %{http_code}\n"
-          
-          echo "Release triggered for staged artifacts"
-
       - name: Publish notification
         if: ${{ !endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
         run: |
