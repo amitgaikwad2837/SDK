@@ -109,3 +109,118 @@ jobs:
         if: ${{ endsWith(steps.version.outputs.version, '-SNAPSHOT') }}
         run: |
           echo "Skipping Maven Central publish for snapshot version ${{ steps.version.outputs.version }}"
+
+  promote-and-verify:
+    needs: publish-android-sdks
+    if: ${{ needs.publish-android-sdks.result == 'success' && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Promote validated deployments in Sonatype
+        env:
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          AUTH=$(printf "%s:%s" "$CENTRAL_PORTAL_USERNAME" "$CENTRAL_PORTAL_PASSWORD" | base64 | tr -d '\n')
+          API_BASE="https://central.sonatype.com/api/v1/publisher"
+          GROUP_ID="io.github.amitgaikwad2837"
+
+          echo "Looking for VALIDATED deployments for $GROUP_ID version $VERSION"
+          deployment_ids=""
+
+          for attempt in $(seq 1 20); do
+            echo "Attempt $attempt/20: querying deployment list"
+            json=$(curl -fsS \
+              -H "Authorization: Bearer $AUTH" \
+              "$API_BASE/deployments")
+
+            deployment_ids=$(echo "$json" | jq -r --arg group "$GROUP_ID" --arg version "$VERSION" '
+              [
+                .. | objects
+                | . as $obj
+                | ($obj.deploymentState // $obj.state // "") as $state
+                | ($obj.deploymentId // $obj.id // "") as $id
+                | ($obj.namespace // $obj.groupId // $obj.group // "") as $ns
+                | ($obj.version // "") as $ver
+                | ($obj.purls // []) as $purls
+                | select($state == "VALIDATED")
+                | select($id != "")
+                | select(
+                    ($ns == $group)
+                    or ([$purls[]? | tostring] | join(" ") | contains($group))
+                  )
+                | select(
+                    ($ver == $version)
+                    or ([$purls[]? | tostring] | join(" ") | contains("@" + $version))
+                  )
+                | $id
+              ]
+              | unique
+              | .[]
+            ')
+
+            if [ -n "$deployment_ids" ]; then
+              break
+            fi
+
+            sleep 20
+          done
+
+          if [ -z "$deployment_ids" ]; then
+            echo "::error::No VALIDATED deployment IDs found for $GROUP_ID version $VERSION."
+            echo "::error::Uploads may still be processing or did not register as deployable Portal deployments."
+            exit 1
+          fi
+
+          echo "Promoting deployment IDs:"
+          echo "$deployment_ids"
+
+          while IFS= read -r dep_id; do
+            [ -z "$dep_id" ] && continue
+            echo "Promoting deployment $dep_id"
+            http_code=$(curl -sS -o /tmp/promote-response.txt -w "%{http_code}" \
+              -X POST \
+              -H "Authorization: Bearer $AUTH" \
+              "$API_BASE/deployment/$dep_id")
+
+            if [ "$http_code" != "204" ] && [ "$http_code" != "200" ]; then
+              echo "::error::Failed to promote deployment $dep_id (HTTP $http_code)."
+              cat /tmp/promote-response.txt || true
+              exit 1
+            fi
+          done <<< "$deployment_ids"
+
+      - name: Verify visibility in Maven Central
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          GROUP_ID="io.github.amitgaikwad2837"
+
+          echo "Waiting for Maven Central indexing of $GROUP_ID:$VERSION"
+          for attempt in $(seq 1 45); do
+            response=$(curl -fsS "https://search.maven.org/solrsearch/select?q=g:%22$GROUP_ID%22+AND+v:%22$VERSION%22&rows=20&wt=json")
+            found=$(echo "$response" | jq -r '.response.numFound // 0')
+            echo "Attempt $attempt/45: numFound=$found"
+
+            if [ "$found" -gt 0 ]; then
+              echo "Maven Central now lists $GROUP_ID version $VERSION"
+              exit 0
+            fi
+
+            sleep 20
+          done
+
+          echo "::error::Version $VERSION not visible in Maven Central within timeout window."
+          exit 1
