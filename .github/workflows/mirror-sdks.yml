@@ -1,0 +1,104 @@
+name: Mirror SDKs to Individual Repos
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'projects/**'
+      - '.github/workflows/mirror-sdks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk:
+          # Web SDKs
+          - { folder: 'api-contract-drift-detector', repo: 'api-contract-drift-detector' }
+          - { folder: 'ai-powered-migration-generator', repo: 'ai-powered-migration-generator' }
+          - { folder: 'api-mock-data-intelligence', repo: 'api-mock-data-intelligence' }
+          - { folder: 'architecture-decision-record-generator', repo: 'architecture-decision-record-generator' }
+          - { folder: 'database-query-explainer', repo: 'database-query-explainer' }
+          - { folder: 'enterprise-readiness-scanner', repo: 'enterprise-readiness-scanner' }
+          - { folder: 'frontend-ux-linter', repo: 'frontend-ux-linter' }
+          - { folder: 'openapi-full-stack-generator', repo: 'openapi-full-stack-generator' }
+          - { folder: 'production-incident-copilot', repo: 'production-incident-copilot' }
+          - { folder: 'prompt-testing-framework', repo: 'prompt-testing-framework' }
+          - { folder: 'pull-request-reviewer-agent', repo: 'pull-request-reviewer-agent' }
+          - { folder: 'readme-intelligence-sdk', repo: 'readme-intelligence-sdk' }
+          - { folder: 'saas-boilerplate-analyzer', repo: 'saas-boilerplate-analyzer' }
+          - { folder: 'screen-intelligence-sdk', repo: 'screen-intelligence-sdk' }
+          - { folder: 'ai-sdk-internal-tools', repo: 'ai-sdk-internal-tools' }
+          # Android SDKs
+          - { folder: 'android-ai-provider-core', repo: 'android-ai-provider-core' }
+          - { folder: 'android-emergency-sos-sdk', repo: 'android-emergency-sos-sdk' }
+          - { folder: 'android-fall-detection-sdk', repo: 'android-fall-detection-sdk' }
+          - { folder: 'android-distress-detection-sdk', repo: 'android-distress-detection-sdk' }
+          - { folder: 'android-voice-assistant-sdk', repo: 'android-voice-assistant-sdk' }
+          - { folder: 'android-ocr-explain-sdk', repo: 'android-ocr-explain-sdk' }
+          - { folder: 'android-accessibility-assistant-sdk', repo: 'android-accessibility-assistant-sdk' }
+          - { folder: 'android-vision-assistance-sdk', repo: 'android-vision-assistance-sdk' }
+
+    steps:
+      - name: Checkout monorepo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mirror ${{ matrix.sdk.folder }} to ${{ matrix.sdk.repo }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SDK_FOLDER: ${{ matrix.sdk.folder }}
+          SDK_REPO: ${{ matrix.sdk.repo }}
+          ORG: ${{ github.repository_owner }}
+        run: |
+          set -e
+          
+          # Create temp directories
+          mkdir -p /tmp/sdk-mirror /tmp/sdk-repo
+          
+          # Copy SDK from monorepo
+          echo "📦 Copying $SDK_FOLDER from monorepo..."
+          cp -r "projects/$SDK_FOLDER"/* /tmp/sdk-mirror/
+          
+          # Clone target repo
+          echo "🔗 Cloning target repo..."
+          cd /tmp/sdk-repo
+          git clone --depth 1 "https://github.com/$ORG/$SDK_REPO.git" . 2>&1 || true
+          
+          # Initialize if new repo
+          if [ ! -d .git ]; then
+            echo "🆕 Initializing new repository..."
+            git init
+            git remote add origin "https://github.com/$ORG/$SDK_REPO.git"
+          fi
+          
+          # Configure git
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          
+          # Copy files
+          echo "📋 Copying SDK files..."
+          rm -rf * .gitignore .github 2>/dev/null || true
+          cp -r /tmp/sdk-mirror/* .
+          
+          # Commit and push
+          echo "💾 Committing changes..."
+          git add .
+          
+          if git commit -m "Mirror from monorepo ($(date +%Y-%m-%d)) - ${{ github.sha }}"; then
+            echo "🚀 Pushing to $SDK_REPO..."
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$ORG/$SDK_REPO.git" main 2>&1 || \
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$ORG/$SDK_REPO.git" master 2>&1 || \
+            echo "⚠️ Push failed (repo may not have main/master branch yet)"
+          else
+            echo "✓ No changes to commit"
+          fi
+
+      - name: Summary
+        if: always()
+        run: echo "✅ Mirror job complete for ${{ matrix.sdk.repo }}"

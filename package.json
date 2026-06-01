@@ -1,0 +1,14 @@
+{
+  "name": "public-sdk-portfolio",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "projects/*"
+  ],
+  "scripts": {
+    "build": "npm run --ws build",
+    "test": "npm run --ws test",
+    "lint": "npm run --ws lint",
+    "typecheck": "npm run --ws typecheck"
+  }
+}

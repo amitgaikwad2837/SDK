@@ -1,0 +1,27 @@
+{
+  "name": "android-fall-detection-sdk",
+  "version": "1.0.0",
+  "description": "Real-time fall detection for elderly and worker safety",
+  "platform": "android",
+  "category": "safety-emergency",
+  "minSdk": 24,
+  "targetSdk": 34,
+  "language": "kotlin",
+  "buildSystem": "gradle",
+  "features": [
+    "accelerometer-monitoring",
+    "gyroscope-monitoring",
+    "impact-detection",
+    "immobility-detection",
+    "ml-scoring",
+    "event-streaming"
+  ],
+  "dependencies": [
+    "tensorflow-lite"
+  ],
+  "permissions": [
+    "SENSORS",
+    "INTERNET"
+  ],
+  "tags": ["android", "safety", "fall-detection", "elderly-care"]
+}

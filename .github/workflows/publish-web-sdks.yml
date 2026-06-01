@@ -1,0 +1,70 @@
+name: Publish Web SDKs to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-web-sdks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk:
+          - api-contract-drift-detector
+          - ai-powered-migration-generator
+          - api-mock-data-intelligence
+          - architecture-decision-record-generator
+          - database-query-explainer
+          - enterprise-readiness-scanner
+          - frontend-ux-linter
+          - openapi-full-stack-generator
+          - production-incident-copilot
+          - prompt-testing-framework
+          - pull-request-reviewer-agent
+          - readme-intelligence-sdk
+          - saas-boilerplate-analyzer
+          - screen-intelligence-sdk
+          - ai-sdk-internal-tools
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Install dependencies
+        working-directory: projects/${{ matrix.sdk }}
+        run: npm ci
+
+      - name: Run tests
+        working-directory: projects/${{ matrix.sdk }}
+        run: npm test
+
+      - name: Build
+        working-directory: projects/${{ matrix.sdk }}
+        run: npm run build
+
+      - name: Publish to npm
+        working-directory: projects/${{ matrix.sdk }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish notification
+        run: |
+          echo "✅ Published ${{ matrix.sdk }} to npm"
+          echo "📦 https://www.npmjs.com/package/@your-org/${{ matrix.sdk }}"

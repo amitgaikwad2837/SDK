@@ -1,0 +1,63 @@
+name: Publish Android SDKs to Maven Central
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish-android-sdks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        sdk:
+          - android-ai-provider-core
+          - android-emergency-sos-sdk
+          - android-fall-detection-sdk
+          - android-distress-detection-sdk
+          - android-voice-assistant-sdk
+          - android-ocr-explain-sdk
+          - android-accessibility-assistant-sdk
+          - android-vision-assistance-sdk
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Build with Gradle
+        working-directory: projects/${{ matrix.sdk }}
+        run: chmod +x gradlew && ./gradlew build
+
+      - name: Run tests
+        working-directory: projects/${{ matrix.sdk }}
+        run: ./gradlew test
+
+      - name: Publish to Maven Central
+        working-directory: projects/${{ matrix.sdk }}
+        run: ./gradlew publish
+        env:
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+
+      - name: Publish notification
+        run: |
+          echo "✅ Published ${{ matrix.sdk }} to Maven Central"
+          echo "📦 https://central.sonatype.com/artifact/io.github.amitgaikwad2837/${{ matrix.sdk }}"
