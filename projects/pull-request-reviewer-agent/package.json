@@ -1,5 +1,5 @@
 {
-  "name": "@public-sdk/pull-request-reviewer-agent",
+  "name": "pull-request-reviewer-agent",
   "version": "0.1.0",
   "type": "module",
   "description": "Pull Request Reviewer Agent starter implementation scaffold",
@@ -25,5 +25,6 @@
     "vitest": "^2.1.8"
   }
 }
+
 
 

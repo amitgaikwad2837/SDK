@@ -1,5 +1,5 @@
 {
-  "name": "@public-sdk/database-query-explainer",
+  "name": "database-query-explainer",
   "version": "0.1.0",
   "type": "module",
   "description": "Database Query Explainer starter implementation scaffold",
@@ -25,5 +25,6 @@
     "vitest": "^2.1.8"
   }
 }
+
 
 
