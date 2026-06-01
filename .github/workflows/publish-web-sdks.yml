@@ -86,4 +86,4 @@ jobs:
       - name: Publish notification
         run: |
           echo "Published ${{ matrix.sdk }}@${{ steps.version.outputs.version }} to npm (tag: ${{ steps.version.outputs.dist_tag }})"
-          echo "https://www.npmjs.com/package/@amitgaikwad2837/${{ matrix.sdk }}"
+          echo "https://www.npmjs.com/package/@amitgaikwad37/${{ matrix.sdk }}"
