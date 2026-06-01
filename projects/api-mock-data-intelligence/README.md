@@ -1,4 +1,8 @@
-﻿# API Mock Data Intelligence
+﻿> Mirror Policy: This repository is an automated mirror of the monorepo https://github.com/amitgaikwad2837/SDK.
+>
+> Do not push changes directly here. All changes must be made in the SDK monorepo and synced by workflow.
+> Pull requests opened in this repo are for review visibility only and may be overwritten by the next sync.
+# API Mock Data Intelligence
 
 ## 📦 Registry & Repository
 
@@ -55,3 +59,4 @@ npm test
 ## License
 
 MIT
+
