@@ -1,27 +1,48 @@
-﻿# OpenAPI to Full Stack Generator
+﻿# OpenAPI Full Stack Generator
 
-## Summary
+## Overview
 
-Generate backend, SDK, hooks, mocks, and tests from one OpenAPI contract.
+Generate backend and frontend starter components from OpenAPI definitions.
 
-## Why It Matters
+## Installation
 
-This project addresses a common pain point in modern engineering teams and can provide strong open source and commercial value if executed with developer-first ergonomics.
+~~~bash
+npm install @public-sdk/openapi-full-stack-generator
+~~~
 
-## Primary Users
+## Quick Start
 
-- Platform engineers
-- Backend and frontend developers
-- DevOps and SRE teams
-- Engineering managers
+~~~bash
+npx generate-stack --help
+~~~
 
-## Initial Scope
+## Integration Example
 
-- Build a focused MVP CLI/SDK/Action with one core workflow done well.
-- Add clear output formats for CI pipelines and local developer feedback.
-- Provide extensibility points for enterprise integration.
+1. Add this SDK to your CI workflow or local tooling script.
+2. Run the command against your project inputs.
+3. Fail the pipeline on non-zero exit code to enforce quality gates.
 
-## Documentation
+~~~bash
+npx generate-stack --json
+~~~
 
-- Requirements: docs/requirements.md
-- Implementation Plan: docs/implementation-plan.md
+## Typical Output
+
+~~~json
+{
+  "command": "generate-stack",
+  "summary": "Execution completed successfully"
+}
+~~~
+
+## Local Development
+
+~~~bash
+npm ci
+npm run build
+npm test
+~~~
+
+## License
+
+MIT

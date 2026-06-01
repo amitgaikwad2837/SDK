@@ -1,3 +1,21 @@
-﻿# Examples
+﻿# Frontend UX Linter Examples
 
-Starter examples for Frontend Ux Linter will be added in v0.1 implementation.
+## CLI Example
+
+Run this command from your project root:
+
+~~~bash
+npx ux-lint --json
+~~~
+
+## CI Example (GitHub Actions)
+
+~~~yaml
+- name: Run Frontend UX Linter
+  run: npx ux-lint --json
+~~~
+
+## Notes
+
+- Keep example inputs small and deterministic.
+- Commit expected outputs when you want regression visibility in pull requests.

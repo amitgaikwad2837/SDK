@@ -1,27 +1,52 @@
 ﻿# API Mock Data Intelligence
 
-## Summary
+## Overview
 
-Generate realistic relational mock data with edge cases for robust testing.
+Create realistic mock payloads from API contracts and schema hints.
 
-## Why It Matters
+## Installation
 
-This project addresses a common pain point in modern engineering teams and can provide strong open source and commercial value if executed with developer-first ergonomics.
+~~~bash
+npm install @public-sdk/api-mock-data-intelligence
+~~~
 
-## Primary Users
+## Quick Start
 
-- Platform engineers
-- Backend and frontend developers
-- DevOps and SRE teams
-- Engineering managers
+~~~bash
+npx mock-data-gen --help
+~~~
 
-## Initial Scope
+## Integration Example
 
-- Build a focused MVP CLI/SDK/Action with one core workflow done well.
-- Add clear output formats for CI pipelines and local developer feedback.
-- Provide extensibility points for enterprise integration.
+1. Add this SDK to your CI workflow or local tooling script.
+2. Run the command against your project inputs.
+3. Fail the pipeline on non-zero exit code to enforce quality gates.
 
-## Documentation
+~~~bash
+npx mock-data-gen --schema ./examples/schema.json --scale 250 --locale en_US --json
+~~~
 
-- Requirements: docs/requirements.md
-- Implementation Plan: docs/implementation-plan.md
+## Typical Output
+
+~~~json
+{
+  "command": "mock-data-gen",
+  "summary": "Generated mock datasets",
+  "integrityReport": {
+    "totalRecords": 250,
+    "integrityChecks": ["foreignKeyConsistency", "enumValidity"]
+  }
+}
+~~~
+
+## Local Development
+
+~~~bash
+npm ci
+npm run build
+npm test
+~~~
+
+## License
+
+MIT

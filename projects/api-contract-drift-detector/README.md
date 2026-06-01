@@ -1,27 +1,53 @@
 ﻿# API Contract Drift Detector
 
-## Summary
+## Overview
 
-Detect drift between OpenAPI specs, backend implementation, SDKs, and docs.
+Detect drift between OpenAPI specs and backend implementations before it reaches production.
 
-## Why It Matters
+## Installation
 
-This project addresses a common pain point in modern engineering teams and can provide strong open source and commercial value if executed with developer-first ergonomics.
+~~~bash
+npm install @public-sdk/api-contract-drift-detector
+~~~
 
-## Primary Users
+## Quick Start
 
-- Platform engineers
-- Backend and frontend developers
-- DevOps and SRE teams
-- Engineering managers
+~~~bash
+npx drift-check --help
+~~~
 
-## Initial Scope
+## Integration Example
 
-- Build a focused MVP CLI/SDK/Action with one core workflow done well.
-- Add clear output formats for CI pipelines and local developer feedback.
-- Provide extensibility points for enterprise integration.
+1. Add this SDK to your CI workflow or local tooling script.
+2. Run the command against your project inputs.
+3. Fail the pipeline on non-zero exit code to enforce quality gates.
 
-## Documentation
+~~~bash
+npx drift-check --openapi ./examples/openapi.yaml --backend ./examples/backend.yaml --json
+~~~
 
-- Requirements: docs/requirements.md
-- Implementation Plan: docs/implementation-plan.md
+## Typical Output
+
+~~~json
+{
+  "command": "drift-check",
+  "summary": "2 warnings detected",
+  "stats": {
+    "totalEndpoints": 18,
+    "errors": 0,
+    "warnings": 2
+  }
+}
+~~~
+
+## Local Development
+
+~~~bash
+npm ci
+npm run build
+npm test
+~~~
+
+## License
+
+MIT

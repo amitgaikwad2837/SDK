@@ -1,3 +1,21 @@
-﻿# Examples
+﻿# OpenAPI Full Stack Generator Examples
 
-Starter examples for Openapi Full Stack Generator will be added in v0.1 implementation.
+## CLI Example
+
+Run this command from your project root:
+
+~~~bash
+npx generate-stack --json
+~~~
+
+## CI Example (GitHub Actions)
+
+~~~yaml
+- name: Run OpenAPI Full Stack Generator
+  run: npx generate-stack --json
+~~~
+
+## Notes
+
+- Keep example inputs small and deterministic.
+- Commit expected outputs when you want regression visibility in pull requests.
