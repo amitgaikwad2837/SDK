@@ -1,0 +1,37 @@
+name: Drop Stuck Sonatype Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployment_id:
+        description: 'Sonatype Portal deployment ID to drop'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  drop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Drop deployment
+        env:
+          CENTRAL_PORTAL_USERNAME: ${{ secrets.CENTRAL_PORTAL_USERNAME }}
+          CENTRAL_PORTAL_PASSWORD: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
+          DEPLOYMENT_ID: ${{ github.event.inputs.deployment_id }}
+        run: |
+          set -euo pipefail
+          AUTH=$(printf "%s:%s" "$CENTRAL_PORTAL_USERNAME" "$CENTRAL_PORTAL_PASSWORD" | base64 | tr -d '\n')
+          echo "Dropping deployment $DEPLOYMENT_ID"
+          http_code=$(curl -sS -o /tmp/drop-response.txt -w "%{http_code}" \
+            -X DELETE \
+            -H "Authorization: Bearer $AUTH" \
+            "https://central.sonatype.com/api/v1/publisher/deployment/$DEPLOYMENT_ID")
+          cat /tmp/drop-response.txt || true
+          echo "HTTP Status: $http_code"
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ] || [ "$http_code" = "404" ]; then
+            echo "Deployment dropped (or already gone)"
+          else
+            echo "::error::Failed to drop deployment (HTTP $http_code)"
+            exit 1
+          fi
